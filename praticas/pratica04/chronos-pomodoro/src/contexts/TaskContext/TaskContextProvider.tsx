@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { initialTaskState } from './initialTaskState';
 import { taskReducer } from './taskReducer';
 import { TaskContext } from './TaskContext';
@@ -6,12 +6,17 @@ import { TimerWorkerManager } from '../../workers/TimerWorkerManager';
 import { TaskActionTypes } from './taskActions';
 import { loadBeep } from '../../utils/loadBeep';
 import type { TaskStateModel } from '../../models/TaskStateModel';
+import { getSettings } from '../../services/settingsService';
+import { getTasks } from '../../services/tasksService';
 
 type TaskContextProviderProps = {
   children: React.ReactNode;
 };
 
 export function TaskContextProvider({ children }: TaskContextProviderProps) {
+  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
+  const [isLoadingTasks, setIsLoadingTasks] = useState(true);
+
   const [state, dispatch] = useReducer(taskReducer, initialTaskState, () => {
     const storageState = localStorage.getItem('state');
 
@@ -73,8 +78,54 @@ export function TaskContextProvider({ children }: TaskContextProviderProps) {
     }
   }, [state.activeTask]);
 
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const settings = await getSettings();
+
+        dispatch({
+          type: TaskActionTypes.CHANGE_SETTINGS,
+          payload: {
+            workTime: settings.workTime,
+            shortBreakTime: settings.shortBreakTime,
+            longBreakTime: settings.longBreakTime,
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoadingSettings(false);
+      }
+    }
+
+    async function loadTasks() {
+      try {
+        const tasks = await getTasks();
+
+        dispatch({
+          type: TaskActionTypes.LOAD_TASKS,
+          payload: tasks,
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoadingTasks(false);
+      }
+    }
+
+    loadSettings();
+    loadTasks();
+  }, []);
+
   return (
-    <TaskContext.Provider value={{ state, dispatch }}>
+    <TaskContext.Provider
+      value={{
+        state,
+        dispatch,
+        isLoadingSettings,
+        isLoadingTasks,
+      }}
+    >
       {children}
     </TaskContext.Provider>
   );

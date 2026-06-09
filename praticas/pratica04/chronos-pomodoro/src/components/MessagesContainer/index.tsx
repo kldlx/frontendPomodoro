@@ -11,7 +11,7 @@ export function MessagesContainer({ children }: MessagesContainerProps) {
 
       <ToastContainer
         position='top-center'
-        autoClose={10000}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick={true}
