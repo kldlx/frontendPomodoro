@@ -3,7 +3,6 @@ import { Container } from '../../components/Container';
 import { DefaultButton } from '../../components/DefaultButton';
 import { Heading } from '../../components/Heading';
 import { MainTemplate } from '../../templates/MainTemplate';
-
 import styles from './styles.module.css';
 import { useTaskContext } from '../../contexts/TaskContext/useTaskContext';
 import { formatDate } from '../../utils/formatDate';
@@ -12,10 +11,13 @@ import { sortTasks, type SortTasksOptions } from '../../utils/sortTasks';
 import { useEffect, useState } from 'react';
 import { TaskActionTypes } from '../../contexts/TaskContext/taskActions';
 import { showMessage } from '../../adapters/showMessage';
+import { deleteTasks } from '../../services/tasksService';
 
 export function History() {
-  const { state, dispatch } = useTaskContext();
+  const { state, dispatch, isLoadingTasks } = useTaskContext();
   const [confirmClearHistory, setConfirmClearHistory] = useState(false);
+  const [isDeletingTasks, setIsDeletingTasks] = useState(false);
+  const isHistoryBusy = isLoadingTasks || isDeletingTasks;
   const hasTasks = state.tasks.length > 0;
 
   const [sortTasksOptions, setSortTaskOptions] = useState<SortTasksOptions>(
@@ -46,9 +48,22 @@ export function History() {
   useEffect(() => {
     if (!confirmClearHistory) return;
 
-    setConfirmClearHistory(false);
+    async function clearHistory() {
+      setConfirmClearHistory(false);
+      setIsDeletingTasks(true);
 
-    dispatch({ type: TaskActionTypes.RESET_STATE });
+      try {
+        await deleteTasks();
+
+        dispatch({ type: TaskActionTypes.RESET_STATE });
+      } catch {
+        return;
+      } finally {
+        setIsDeletingTasks(false);
+      }
+    }
+
+    clearHistory();
   }, [confirmClearHistory, dispatch]);
 
   useEffect(() => {
@@ -91,6 +106,7 @@ export function History() {
                 aria-label='Apagar todo o histórico'
                 title='Apagar histórico'
                 onClick={handleResetHistory}
+                disabled={isHistoryBusy}
               />
             </span>
           )}
@@ -98,6 +114,16 @@ export function History() {
       </Container>
 
       <Container>
+        {isLoadingTasks && (
+          <p style={{ textAlign: 'center', fontWeight: 'bold' }}>
+            Carregando histórico...
+          </p>
+        )}
+        {isDeletingTasks && (
+          <p style={{ textAlign: 'center', fontWeight: 'bold' }}>
+            Apagando histórico...
+          </p>
+        )}
         {hasTasks && (
           <div className={styles.responsiveTable}>
             <table>
@@ -147,7 +173,7 @@ export function History() {
             </table>
           </div>
         )}
-        {!hasTasks && (
+        {!hasTasks && !isHistoryBusy && (
           <p style={{ textAlign: 'center', fontWeight: 'bold' }}>
             Ainda não existem tarefas criadas.
           </p>

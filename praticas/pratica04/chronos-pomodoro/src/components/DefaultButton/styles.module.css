@@ -22,6 +22,16 @@
   filter: brightness(80%);
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  filter: grayscale(35%);
+  opacity: 0.65;
+}
+
+.button:disabled:hover {
+  filter: grayscale(35%);
+}
+
 .green {
   background: var(--primary);
   color: var(--text-over-primary);

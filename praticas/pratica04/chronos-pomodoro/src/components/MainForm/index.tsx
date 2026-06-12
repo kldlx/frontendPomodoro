@@ -2,7 +2,7 @@ import { PlayCircleIcon, StopCircleIcon } from 'lucide-react';
 import { Cycles } from '../Cycles';
 import { DefaultButton } from '../DefaultButton';
 import { DefaultInput } from '../DefaultInput';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { TaskModel } from '../../models/TaskModel';
 import { useTaskContext } from '../../contexts/TaskContext/useTaskContext';
 import { getNextCycle } from '../../utils/getNextCycle';
@@ -10,13 +10,20 @@ import { getNextCycleType } from '../../utils/getNextCycleType';
 import { TaskActionTypes } from '../../contexts/TaskContext/taskActions';
 import { Tips } from '../Tips';
 import { showMessage } from '../../adapters/showMessage';
+import {
+  createTask,
+  interruptTask,
+} from '../../services/tasksService';
 
 export function MainForm() {
   const { state, dispatch } = useTaskContext();
+  const [isCreatingTask, setIsCreatingTask] = useState(false);
+  const [isInterruptingTask, setIsInterruptingTask] = useState(false);
+  const isTaskActionInProgress = isCreatingTask || isInterruptingTask;
   const taskNameInput = useRef<HTMLInputElement>(null);
   const lastTaskName = state.tasks[state.tasks.length - 1]?.name || '';
 
-  function handleCreateNewTask(event: React.FormEvent<HTMLFormElement>) {
+  async function handleCreateNewTask(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     showMessage.dismiss();
 
@@ -42,14 +49,40 @@ export function MainForm() {
       type: nextCyleType,
     };
 
+    setIsCreatingTask(true);
     dispatch({ type: TaskActionTypes.START_TASK, payload: newTask });
     showMessage.success('Tarefa iniciada');
+
+    try {
+      await createTask(newTask, { notifyOnError: false });
+    } catch {
+      return;
+    } finally {
+      setIsCreatingTask(false);
+    }
   }
 
-  function handleInterruptTask() {
+  async function handleInterruptTask() {
     showMessage.dismiss();
-    showMessage.error('Tarefa interrompida!');
+
+    if (!state.activeTask) return;
+
+    const activeTaskId = state.activeTask.id;
+    const interruptDate = Date.now();
+
+    setIsInterruptingTask(true);
     dispatch({ type: TaskActionTypes.INTERRUPT_TASK });
+    showMessage.warn('Tarefa interrompida!');
+
+    try {
+      await interruptTask(activeTaskId, interruptDate, {
+        notifyOnError: false,
+      });
+    } catch {
+      return;
+    } finally {
+      setIsInterruptingTask(false);
+    }
   }
 
   return (
@@ -61,7 +94,7 @@ export function MainForm() {
           type='text'
           placeholder='Digite algo'
           ref={taskNameInput}
-          disabled={!!state.activeTask}
+          disabled={!!state.activeTask || isTaskActionInProgress}
           defaultValue={lastTaskName}
         />
       </div>
@@ -83,6 +116,7 @@ export function MainForm() {
             title='Iniciar nova tarefa'
             type='submit'
             icon={<PlayCircleIcon />}
+            disabled={isTaskActionInProgress}
           />
         )}
 
@@ -95,6 +129,7 @@ export function MainForm() {
             icon={<StopCircleIcon />}
             onClick={handleInterruptTask}
             key='botao_button'
+            disabled={isTaskActionInProgress}
           />
         )}
       </div>
