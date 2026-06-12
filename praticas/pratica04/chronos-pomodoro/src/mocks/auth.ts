@@ -1,0 +1,1 @@
+export { MOCK_USERNAME, MOCK_PASSWORD } from '../constants/mockCredentials';
