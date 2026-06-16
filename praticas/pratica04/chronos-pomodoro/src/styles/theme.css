@@ -1,0 +1,62 @@
+:root {
+  /* Escala de cinza para tema escuro */
+  --gray-100: #f5f3ff;
+  --gray-200: #ddd6fe;
+  --gray-300: #c4b5fd;
+  --gray-400: #8b5cf6;
+  --gray-500: #7c3aed;
+  --gray-600: #6d28d9;
+  --gray-700: #4c1d95;
+  --gray-800: #1f1235;
+  --gray-900: #0f0a19;
+
+  /* Roxo moderno */
+  --primary-light: #a78bfa;
+  --primary: #7c3aed;
+  --primary-dark: #5b21b6;
+
+  --link-color: #a78bfa;
+  --link-hover: #c4b5fd;
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #6366f1;
+
+  --text-over-primary: #ffffff;
+  --text-over-primary-dark: #ffffff;
+  --text-over-primary-light: #ffffff;
+  --text-over-success: #ffffff;
+  --text-over-warning: #000000;
+  --text-over-error: #ffffff;
+  --text-over-info: #ffffff;
+
+  --text-default: #f8fafc;
+  --text-muted: #cbd5e1;
+
+  --disabled: #475569;
+  --text-disabled: #94a3b8;
+}
+
+/* Tema claro */
+:root[data-theme='light'] {
+  --gray-100: #ffffff;
+  --gray-200: #f8fafc;
+  --gray-300: #e2e8f0;
+  --gray-400: #cbd5e1;
+  --gray-500: #94a3b8;
+  --gray-600: #64748b;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+
+  --primary-light: #c4b5fd;
+  --primary: #7c3aed;
+  --primary-dark: #5b21b6;
+
+  --text-default: #0f172a;
+  --text-muted: #64748b;
+
+  --link-color: #7c3aed;
+  --link-hover: #5b21b6;
+}
