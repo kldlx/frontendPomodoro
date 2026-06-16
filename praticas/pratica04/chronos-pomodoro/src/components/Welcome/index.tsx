@@ -11,7 +11,7 @@ export function Welcome() {
             </h2>
 
             <p>
-                Bem-vindo ao Kratos Pomodoro.
+                Bem-vindo ao Timer Fast.
             </p>
         </div>
     );

@@ -20,7 +20,7 @@ export function Register() {
 
   useEffect(() => {
     document.title =
-      'Cadastro - Kratos Pomodoro';
+      'Cadastro - Timer Fast';
   }, []);
 
   async function handleSubmit(

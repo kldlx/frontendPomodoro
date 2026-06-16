@@ -7,7 +7,7 @@ function getAuthHeaders(): Record<string, string> {
     'Content-Type': 'application/json',
   };
 
-  const authData = sessionStorage.getItem('kratos-auth');
+  const authData = sessionStorage.getItem('Timer-auth');
 
   if (!authData) {
     return headers;

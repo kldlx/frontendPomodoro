@@ -20,7 +20,7 @@ export function Login() {
     useState('');
 
   useEffect(() => {
-    document.title = 'Login - Kratos Pomodoro';
+    document.title = 'Login - Timer Fast';
   }, []);
 
   async function handleSubmit(

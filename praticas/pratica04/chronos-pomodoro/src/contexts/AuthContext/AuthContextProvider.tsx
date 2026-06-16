@@ -6,7 +6,7 @@ type AuthContextProviderProps = {
   children: React.ReactNode;
 };
 
-const STORAGE_KEY = 'kratos-auth';
+const STORAGE_KEY = 'Timer-auth';
 
 type AuthStorage = {
   token: string;

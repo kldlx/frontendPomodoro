@@ -75,7 +75,7 @@ export function TaskContextProvider({
       worker.terminate();
     }
 
-    document.title = `${state.formattedSecondsRemaining} - Kratos Pomodoro`;
+    document.title = `${state.formattedSecondsRemaining} - Timer Fast`;
 
     worker.postMessage(state);
   }, [worker, state]);

@@ -31,11 +31,11 @@ Com isso, sempre que a página é aberta, o título da aba é atualizado para re
 
 ## Resultado esperado
 
-- Home: título da aba exibe `Kratos Pomodoro`.
-- Histórico: título da aba exibe `Histórico - Kratos Pomodoro`.
-- Configurações: título da aba exibe `Configurações - Kratos Pomodoro`.
-- Sobre: título da aba exibe `Entenda a Técnica Pomodoro - Kratos Pomodoro`.
-- 404: título da aba exibe `Página não encontrada - Kratos Pomodoro`.
+- Home: título da aba exibe `Timer Fast`.
+- Histórico: título da aba exibe `Histórico - Timer Fast`.
+- Configurações: título da aba exibe `Configurações - Timer Fast`.
+- Sobre: título da aba exibe `Entenda a Técnica Pomodoro - Timer Fast`.
+- 404: título da aba exibe `Página não encontrada - Timer Fast`.
 
 ---
 
@@ -52,7 +52,7 @@ import { MainTemplate } from '../../templates/MainTemplate';
 
 export function Home() {
   useEffect(() => {
-    document.title = 'Kratos Pomodoro';
+    document.title = 'Timer Fast';
   }, []);
 
   return (
@@ -114,7 +114,7 @@ export function History() {
   }, [state.tasks]);
 
   useEffect(() => {
-    document.title = 'Histórico - Kratos Pomodoro';
+    document.title = 'Histórico - Timer Fast';
   }, []);
 
   useEffect(() => {
@@ -253,7 +253,7 @@ export function Settings() {
   const longBreakTimeInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    document.title = 'Configurações - Kratos Pomodoro';
+    document.title = 'Configurações - Timer Fast';
   }, []);
 
   function handleSaveSettings(e: React.FormEvent<HTMLFormElement>) {
@@ -368,7 +368,7 @@ import { MainTemplate } from '../../templates/MainTemplate';
 
 export function AboutPomodoro() {
   useEffect(() => {
-    document.title = 'Entenda a Técnica Pomodoro - Kratos Pomodoro';
+    document.title = 'Entenda a Técnica Pomodoro - Timer Fast';
   }, []);
 
   return (
@@ -396,7 +396,7 @@ import { MainTemplate } from '../../templates/MainTemplate';
 
 export function NotFound() {
   useEffect(() => {
-    document.title = 'Página não encontrada - Kratos Pomodoro';
+    document.title = 'Página não encontrada - Timer Fast';
   }, []);
 
   return (
@@ -418,5 +418,5 @@ export function NotFound() {
 
 - [ ] Cada página principal define seu próprio `document.title`.
 - [ ] `useEffect` usa dependências vazias (`[]`) para rodar no carregamento da página.
-- [ ] Os títulos seguem um padrão consistente com `Kratos Pomodoro`.
+- [ ] Os títulos seguem um padrão consistente com `Timer Fast`.
 - [ ] Navegar entre rotas atualiza corretamente o texto da aba.

@@ -1,57 +1,62 @@
 :root {
-  --gray-100: #f5f1eb;
-  --gray-200: #d8d0c4;
-  --gray-300: #b8ab9a;
-  --gray-400: #8a7d70;
-  --gray-500: #62584f;
-  --gray-600: #453d37;
-  --gray-700: #2c2724;
-  --gray-800: #1b1816;
-  --gray-900: #0f0d0c;
+  /* Escala de cinza para tema escuro */
+  --gray-100: #f5f3ff;
+  --gray-200: #ddd6fe;
+  --gray-300: #c4b5fd;
+  --gray-400: #8b5cf6;
+  --gray-500: #7c3aed;
+  --gray-600: #6d28d9;
+  --gray-700: #4c1d95;
+  --gray-800: #1f1235;
+  --gray-900: #0f0a19;
 
-  --primary-light: #d9b36c;
-  --primary: #b3261e;
-  --primary-dark: #6e1410;
+  /* Roxo moderno */
+  --primary-light: #a78bfa;
+  --primary: #7c3aed;
+  --primary-dark: #5b21b6;
 
-  --link-color: #d9b36c;
-  --link-hover: #f0c987;
+  --link-color: #a78bfa;
+  --link-hover: #c4b5fd;
 
-  --success: #8c2f23;
-  --warning: #b8892d;
-  --error: #5c0f0c;
-  --info: #7a6a58;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #6366f1;
 
-  --text-over-primary: #f5f1eb;
-  --text-over-primary-dark: #f5f1eb;
-  --text-over-primary-light: #0f0d0c;
-  --text-over-success: #f5f1eb;
-  --text-over-warning: #0f0d0c;
-  --text-over-error: #f5f1eb;
-  --text-over-info: #f5f1eb;
+  --text-over-primary: #ffffff;
+  --text-over-primary-dark: #ffffff;
+  --text-over-primary-light: #ffffff;
+  --text-over-success: #ffffff;
+  --text-over-warning: #000000;
+  --text-over-error: #ffffff;
+  --text-over-info: #ffffff;
 
-  --text-default: #f5f1eb;
-  --text-muted: #b8ab9a;
+  --text-default: #f8fafc;
+  --text-muted: #cbd5e1;
 
-  --disabled: #62584f;
-  --text-disabled: #b8ab9a;
+  --disabled: #475569;
+  --text-disabled: #94a3b8;
 }
 
-/* Quando a tag :root (html) tiver o atributo data-theme='light', 
-   essas variáveis irão sobrescrever as variáveis padrão (dark)! */
-   :root[data-theme='light'] {
-    --gray-100: #0a0f1a;
-    --gray-200: #181f2e;
-    --gray-300: #272f43;
-    --gray-400: #363d56;
-    --gray-500: #454f6a;
-    --gray-600: #555f7d;
-    --gray-700: #aab3cc;
-    --gray-800: #cdd3e1;
-    --gray-900: #e6e9f0;
-  
-    --text-default: #0a0f1a;
-    --text-muted: #272f43;
-  
-    --link-color: #0b8a60;
-    --link-hover: #065f46;
-  }
+/* Tema claro */
+:root[data-theme='light'] {
+  --gray-100: #ffffff;
+  --gray-200: #f8fafc;
+  --gray-300: #e2e8f0;
+  --gray-400: #cbd5e1;
+  --gray-500: #94a3b8;
+  --gray-600: #64748b;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+
+  --primary-light: #c4b5fd;
+  --primary: #7c3aed;
+  --primary-dark: #5b21b6;
+
+  --text-default: #0f172a;
+  --text-muted: #64748b;
+
+  --link-color: #7c3aed;
+  --link-hover: #5b21b6;
+}

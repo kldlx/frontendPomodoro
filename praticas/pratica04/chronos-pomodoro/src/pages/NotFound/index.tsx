@@ -7,7 +7,7 @@ import { MainTemplate } from '../../templates/MainTemplate';
 
 export function NotFound() {
   useEffect(() => {
-    document.title = 'Página não encontrada - Kratos Pomodoro';
+    document.title = 'Página não encontrada - Timer Fast';
   }, []);
 
   return (

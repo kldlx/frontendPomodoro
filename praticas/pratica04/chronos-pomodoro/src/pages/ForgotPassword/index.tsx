@@ -31,7 +31,7 @@ export function ForgotPassword() {
 
   useEffect(() => {
     document.title =
-      'Recuperar Senha - Kratos Pomodoro';
+      'Recuperar Senha - Timer Fast';
   }, []);
 
   async function handleForgotPasswordSubmit(

@@ -40,7 +40,7 @@ export function History() {
   }, [state.tasks]);
 
   useEffect(() => {
-    document.title = 'Histórico - Kratos Pomodoro';
+    document.title = 'Histórico - Timer Fast';
   }, []);
 
   useEffect(() => {

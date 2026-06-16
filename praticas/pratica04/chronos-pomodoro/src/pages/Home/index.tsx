@@ -7,7 +7,7 @@ import { MainTemplate } from '../../templates/MainTemplate';
 
 export function Home() {
   useEffect(() => {
-    document.title = 'Kratos Pomodoro';
+    document.title = 'Timer Fast';
   }, []);
 
   return (

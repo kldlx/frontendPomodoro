@@ -7,7 +7,7 @@ import { MainTemplate } from '../../templates/MainTemplate';
 
 export function AboutPomodoro() {
   useEffect(() => {
-    document.title = 'Entenda a Técnica Pomodoro - Kratos Pomodoro';
+    document.title = 'Entenda a Técnica Pomodoro - Timer Fast';
   }, []);
 
   return (
@@ -44,7 +44,7 @@ export function AboutPomodoro() {
           </ul>
 
           <h2>
-            Mas no <strong>Kratos Pomodoro</strong> tem um diferencial 🚀
+            Mas no <strong>Timer Fast</strong> tem um diferencial 🚀
           </h2>
 
           <p>
@@ -107,7 +107,7 @@ export function AboutPomodoro() {
             evolução ao longo do tempo.
           </p>
 
-          <h2>Por que usar o Kratos Pomodoro?</h2>
+          <h2>Por que usar o Timer Fast?</h2>
           <ul>
             <li>✅ Organize seu foco com clareza.</li>
             <li>✅ Trabalhe e descanse na medida certa.</li>

@@ -17,7 +17,7 @@ export function Settings() {
   const longBreakTimeInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    document.title = 'Configurações - Kratos Pomodoro';
+    document.title = 'Configurações - Timer Fast';
   }, []);
 
 
