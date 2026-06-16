@@ -1,6 +1,6 @@
 {
-  "name": "Chronos Pomodoro",
-  "short_name": "Chronos",
+  "name": "Kratos Pomodoro",
+  "short_name": "Kratos",
   "lang": "pt-BR",
   "icons": [
     {
@@ -28,6 +28,6 @@
   "orientation": "portrait",
   "start_url": "/",
   "scope": "/",
-  "description": "Gerencie seus ciclos de Pomodoro com o Chronos Pomodoro. Timer completo, personalizável e moderno para produtividade máxima.",
+  "description": "Gerencie seus ciclos de Pomodoro com o Kratos Pomodoro. Timer completo, personalizável e moderno para produtividade máxima.",
   "id": "/"
 }

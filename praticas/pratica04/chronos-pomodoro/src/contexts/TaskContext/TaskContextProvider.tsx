@@ -1,77 +1,90 @@
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
+import type { TaskModel } from '../../models/TaskModel';
 import { initialTaskState } from './initialTaskState';
 import { taskReducer } from './taskReducer';
 import { TaskContext } from './TaskContext';
 import { TimerWorkerManager } from '../../workers/TimerWorkerManager';
 import { TaskActionTypes } from './taskActions';
 import { loadBeep } from '../../utils/loadBeep';
-import type { TaskStateModel } from '../../models/TaskStateModel';
-import { getSettings } from '../../services/settingsService';
-import { getTasks } from '../../services/tasksService';
+import { getSettings, getTasks, completeTask } from '../../services/api';
+import { useAuthContext } from '../AuthContext/useAuthContext';
 
 type TaskContextProviderProps = {
   children: React.ReactNode;
 };
 
-export function TaskContextProvider({ children }: TaskContextProviderProps) {
-  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
-  const [isLoadingTasks, setIsLoadingTasks] = useState(true);
+export function TaskContextProvider({
+  children,
+}: TaskContextProviderProps) {
+  const [state, dispatch] = useReducer(
+    taskReducer,
+    initialTaskState,
+  );
 
-  const [state, dispatch] = useReducer(taskReducer, initialTaskState, () => {
-    const storageState = localStorage.getItem('state');
-
-    if (storageState === null) return initialTaskState;
-
-    const parsedStorageState = JSON.parse(storageState) as TaskStateModel;
-
-    return {
-      ...parsedStorageState,
-      activeTask: null,
-      secondsRemaining: 0,
-      formattedSecondsRemaining: '00:00',
-    };
-  });
-
-  const playBeepRef = useRef<ReturnType<typeof loadBeep> | null>(null);
+  const playBeepRef = useRef<
+    ReturnType<typeof loadBeep> | null
+  >(null);
 
   const worker = TimerWorkerManager.getInstance();
+
+  const { isAuthenticated, user } = useAuthContext();
 
   useEffect(() => {
     worker.onmessage(e => {
       const countDownSeconds = e.data;
 
       if (countDownSeconds <= 0) {
-        if (playBeepRef.current) {
-          playBeepRef.current();
-          playBeepRef.current = null;
+        async function finishTask() {
+          if (playBeepRef.current) {
+            playBeepRef.current();
+            playBeepRef.current = null;
+          }
+
+          if (state.activeTask) {
+            try {
+              await completeTask(
+                state.activeTask.id,
+                Date.now(),
+              );
+            } catch (error) {
+              console.error(error);
+            }
+          }
+
+          dispatch({
+            type: TaskActionTypes.COMPLETE_TASK,
+          });
+
+          worker.terminate();
         }
-        dispatch({
-          type: TaskActionTypes.COMPLETE_TASK,
-        });
-        worker.terminate();
+
+        finishTask();
       } else {
         dispatch({
           type: TaskActionTypes.COUNT_DOWN,
-          payload: { secondsRemaining: countDownSeconds },
+          payload: {
+            secondsRemaining: countDownSeconds,
+          },
         });
       }
     });
-  }, [worker]);
+  }, [worker, state.activeTask]);
 
   useEffect(() => {
-    localStorage.setItem('state', JSON.stringify(state));
-
     if (!state.activeTask) {
       worker.terminate();
     }
 
-    document.title = `${state.formattedSecondsRemaining} - Chronos Pomodoro`;
+    document.title = `${state.formattedSecondsRemaining} - Kratos Pomodoro`;
 
     worker.postMessage(state);
   }, [worker, state]);
 
   useEffect(() => {
-    if (state.activeTask && playBeepRef.current === null) {
+    if (
+      state.activeTask &&
+      playBeepRef.current === null
+    ) {
       playBeepRef.current = loadBeep();
     } else {
       playBeepRef.current = null;
@@ -79,6 +92,8 @@ export function TaskContextProvider({ children }: TaskContextProviderProps) {
   }, [state.activeTask]);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     async function loadSettings() {
       try {
         const settings = await getSettings();
@@ -93,38 +108,61 @@ export function TaskContextProvider({ children }: TaskContextProviderProps) {
         });
       } catch (error) {
         console.error(error);
-      } finally {
-        setIsLoadingSettings(false);
       }
     }
+
+    loadSettings();
+  }, [isAuthenticated, user?.id]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
 
     async function loadTasks() {
       try {
         const tasks = await getTasks();
 
+        const parsedTasks = tasks.map(
+          (task: {
+            id: string;
+            name: string;
+            duration: number;
+            type: TaskModel['type'];
+            startDate: string;
+            completeDate: string | null;
+            interruptDate: string | null;
+          }) => ({
+            ...task,
+            startDate: new Date(
+              task.startDate,
+            ).getTime(),
+            completeDate: task.completeDate
+              ? new Date(
+                  task.completeDate,
+                ).getTime()
+              : null,
+            interruptDate: task.interruptDate
+              ? new Date(
+                  task.interruptDate,
+                ).getTime()
+              : null,
+          }),
+        );
+
         dispatch({
           type: TaskActionTypes.LOAD_TASKS,
-          payload: tasks,
+          payload: parsedTasks,
         });
       } catch (error) {
         console.error(error);
-      } finally {
-        setIsLoadingTasks(false);
       }
     }
 
-    loadSettings();
     loadTasks();
-  }, []);
+  }, [isAuthenticated, user?.id]);
 
   return (
     <TaskContext.Provider
-      value={{
-        state,
-        dispatch,
-        isLoadingSettings,
-        isLoadingTasks,
-      }}
+      value={{ state, dispatch }}
     >
       {children}
     </TaskContext.Provider>

@@ -31,11 +31,11 @@ Com isso, sempre que a página é aberta, o título da aba é atualizado para re
 
 ## Resultado esperado
 
-- Home: título da aba exibe `Chronos Pomodoro`.
-- Histórico: título da aba exibe `Histórico - Chronos Pomodoro`.
-- Configurações: título da aba exibe `Configurações - Chronos Pomodoro`.
-- Sobre: título da aba exibe `Entenda a Técnica Pomodoro - Chronos Pomodoro`.
-- 404: título da aba exibe `Página não encontrada - Chronos Pomodoro`.
+- Home: título da aba exibe `Kratos Pomodoro`.
+- Histórico: título da aba exibe `Histórico - Kratos Pomodoro`.
+- Configurações: título da aba exibe `Configurações - Kratos Pomodoro`.
+- Sobre: título da aba exibe `Entenda a Técnica Pomodoro - Kratos Pomodoro`.
+- 404: título da aba exibe `Página não encontrada - Kratos Pomodoro`.
 
 ---
 
@@ -52,7 +52,7 @@ import { MainTemplate } from '../../templates/MainTemplate';
 
 export function Home() {
   useEffect(() => {
-    document.title = 'Chronos Pomodoro';
+    document.title = 'Kratos Pomodoro';
   }, []);
 
   return (
@@ -114,7 +114,7 @@ export function History() {
   }, [state.tasks]);
 
   useEffect(() => {
-    document.title = 'Histórico - Chronos Pomodoro';
+    document.title = 'Histórico - Kratos Pomodoro';
   }, []);
 
   useEffect(() => {
@@ -253,7 +253,7 @@ export function Settings() {
   const longBreakTimeInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    document.title = 'Configurações - Chronos Pomodoro';
+    document.title = 'Configurações - Kratos Pomodoro';
   }, []);
 
   function handleSaveSettings(e: React.FormEvent<HTMLFormElement>) {
@@ -368,7 +368,7 @@ import { MainTemplate } from '../../templates/MainTemplate';
 
 export function AboutPomodoro() {
   useEffect(() => {
-    document.title = 'Entenda a Técnica Pomodoro - Chronos Pomodoro';
+    document.title = 'Entenda a Técnica Pomodoro - Kratos Pomodoro';
   }, []);
 
   return (
@@ -396,7 +396,7 @@ import { MainTemplate } from '../../templates/MainTemplate';
 
 export function NotFound() {
   useEffect(() => {
-    document.title = 'Página não encontrada - Chronos Pomodoro';
+    document.title = 'Página não encontrada - Kratos Pomodoro';
   }, []);
 
   return (
@@ -418,5 +418,5 @@ export function NotFound() {
 
 - [ ] Cada página principal define seu próprio `document.title`.
 - [ ] `useEffect` usa dependências vazias (`[]`) para rodar no carregamento da página.
-- [ ] Os títulos seguem um padrão consistente com `Chronos Pomodoro`.
+- [ ] Os títulos seguem um padrão consistente com `Kratos Pomodoro`.
 - [ ] Navegar entre rotas atualiza corretamente o texto da aba.

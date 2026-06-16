@@ -3,6 +3,7 @@ import { Container } from '../../components/Container';
 import { DefaultButton } from '../../components/DefaultButton';
 import { Heading } from '../../components/Heading';
 import { MainTemplate } from '../../templates/MainTemplate';
+
 import styles from './styles.module.css';
 import { useTaskContext } from '../../contexts/TaskContext/useTaskContext';
 import { formatDate } from '../../utils/formatDate';
@@ -11,13 +12,10 @@ import { sortTasks, type SortTasksOptions } from '../../utils/sortTasks';
 import { useEffect, useState } from 'react';
 import { TaskActionTypes } from '../../contexts/TaskContext/taskActions';
 import { showMessage } from '../../adapters/showMessage';
-import { deleteTasks } from '../../services/tasksService';
+import { clearTasks } from '../../services/api';
 
 export function History() {
-  const { state, dispatch, isLoadingTasks } = useTaskContext();
-  const [confirmClearHistory, setConfirmClearHistory] = useState(false);
-  const [isDeletingTasks, setIsDeletingTasks] = useState(false);
-  const isHistoryBusy = isLoadingTasks || isDeletingTasks;
+  const { state, dispatch } = useTaskContext();
   const hasTasks = state.tasks.length > 0;
 
   const [sortTasksOptions, setSortTaskOptions] = useState<SortTasksOptions>(
@@ -42,29 +40,8 @@ export function History() {
   }, [state.tasks]);
 
   useEffect(() => {
-    document.title = 'Histórico - Chronos Pomodoro';
+    document.title = 'Histórico - Kratos Pomodoro';
   }, []);
-
-  useEffect(() => {
-    if (!confirmClearHistory) return;
-
-    async function clearHistory() {
-      setConfirmClearHistory(false);
-      setIsDeletingTasks(true);
-
-      try {
-        await deleteTasks();
-
-        dispatch({ type: TaskActionTypes.RESET_STATE });
-      } catch {
-        return;
-      } finally {
-        setIsDeletingTasks(false);
-      }
-    }
-
-    clearHistory();
-  }, [confirmClearHistory, dispatch]);
 
   useEffect(() => {
     return () => {
@@ -86,10 +63,23 @@ export function History() {
     });
   }
 
-  function handleResetHistory() {
+  async function handleResetHistory() {
     showMessage.dismiss();
-    showMessage.confirm('Tem certeza?', confirmation => {
-      setConfirmClearHistory(confirmation);
+
+    showMessage.confirm('Tem certeza?', async confirmation => {
+      if (!confirmation) return;
+
+      try {
+        await clearTasks();
+
+        dispatch({
+          type: TaskActionTypes.RESET_STATE,
+        });
+
+        showMessage.success('Histórico apagado');
+      } catch {
+        showMessage.error('Erro ao apagar histórico');
+      }
     });
   }
 
@@ -106,7 +96,6 @@ export function History() {
                 aria-label='Apagar todo o histórico'
                 title='Apagar histórico'
                 onClick={handleResetHistory}
-                disabled={isHistoryBusy}
               />
             </span>
           )}
@@ -114,16 +103,6 @@ export function History() {
       </Container>
 
       <Container>
-        {isLoadingTasks && (
-          <p style={{ textAlign: 'center', fontWeight: 'bold' }}>
-            Carregando histórico...
-          </p>
-        )}
-        {isDeletingTasks && (
-          <p style={{ textAlign: 'center', fontWeight: 'bold' }}>
-            Apagando histórico...
-          </p>
-        )}
         {hasTasks && (
           <div className={styles.responsiveTable}>
             <table>
@@ -173,7 +152,7 @@ export function History() {
             </table>
           </div>
         )}
-        {!hasTasks && !isHistoryBusy && (
+        {!hasTasks && (
           <p style={{ textAlign: 'center', fontWeight: 'bold' }}>
             Ainda não existem tarefas criadas.
           </p>

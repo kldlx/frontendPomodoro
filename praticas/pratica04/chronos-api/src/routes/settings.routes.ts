@@ -1,89 +1,50 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
-export const settingsRoutes = Router();
+export const settingsRouter = Router();
 
-// GET /settings
-settingsRoutes.get('/', async (req, res) => {
-  try {
-    const settings = await prisma.settings.findFirst();
+settingsRouter.use(authMiddleware);
 
-    if (!settings) {
-      const defaultSettings = await prisma.settings.create({
-        data: {
-          workTime: 25,
-          shortBreakTime: 5,
-          longBreakTime: 15,
-        },
-      });
+settingsRouter.get('/', async (request, response) => {
+  const settings = await prisma.settings.findUnique({
+    where: {
+      userId: request.userId,
+    },
+  });
 
-      return res.json(defaultSettings);
-    }
-
-    return res.json(settings);
-  } catch (error) {
-    console.error('ERRO AO BUSCAR CONFIGURAÇÕES:', error);
-
-    return res.status(500).json({
-      error: 'Erro interno ao buscar configurações',
+  if (!settings) {
+    return response.status(404).json({
+      error: 'Configurações não encontradas',
     });
   }
+
+  return response.json(settings);
 });
 
-// PUT /settings
-settingsRoutes.put('/', async (req, res) => {
-  try {
-    console.log('BODY RECEBIDO:', req.body);
+settingsRouter.put('/', async (request, response) => {
+  const { workTime, shortBreakTime, longBreakTime } = request.body;
 
-    const { workTime, shortBreakTime, longBreakTime } = req.body || {};
-
-    if (
-      typeof workTime !== 'number' ||
-      typeof shortBreakTime !== 'number' ||
-      typeof longBreakTime !== 'number'
-    ) {
-      return res.status(400).json({
-        error: 'Invalid payload',
-      });
-    }
-
-    const existing = await prisma.settings.findFirst();
-
-    console.log('CONFIG EXISTENTE:', existing);
-
-    if (!existing) {
-      const created = await prisma.settings.create({
-        data: {
-          workTime,
-          shortBreakTime,
-          longBreakTime,
-        },
-      });
-
-      console.log('CONFIG CRIADA:', created);
-
-      return res.json(created);
-    }
-
-    const updated = await prisma.settings.update({
-      where: {
-        id: existing.id,
-      },
-      data: {
-        workTime,
-        shortBreakTime,
-        longBreakTime,
-      },
-    });
-
-    console.log('CONFIG ATUALIZADA:', updated);
-
-    return res.json(updated);
-  } catch (error) {
-    console.error('ERRO AO SALVAR CONFIGURAÇÕES:', error);
-
-    return res.status(500).json({
-      error: 'Erro interno ao salvar configurações',
+  if (
+    typeof workTime !== 'number' ||
+    typeof shortBreakTime !== 'number' ||
+    typeof longBreakTime !== 'number'
+  ) {
+    return response.status(400).json({
+      error: 'workTime, shortBreakTime e longBreakTime devem ser números',
     });
   }
+
+  const settings = await prisma.settings.update({
+    where: {
+      userId: request.userId,
+    },
+    data: {
+      workTime,
+      shortBreakTime,
+      longBreakTime,
+    },
+  });
+
+  return response.json(settings);
 });

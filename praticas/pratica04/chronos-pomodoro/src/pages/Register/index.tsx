@@ -6,21 +6,21 @@ import { Container } from '../../components/Container';
 import { DefaultInput } from '../../components/DefaultInput';
 import { Logo } from '../../components/Logo';
 
-import { useAuthContext } from '../../contexts/AuthContext';
+import { registerUser } from '../../services/api';
 
-import styles from './styles.module.css';
+import styles from '../Login/styles.module.css';
 
-export function Login() {
+export function Register() {
   const navigate = useNavigate();
-  const { login } = useAuthContext();
 
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [feedbackMessage, setFeedbackMessage] =
+  const [password, setPassword] =
     useState('');
 
   useEffect(() => {
-    document.title = 'Login - Kratos Pomodoro';
+    document.title =
+      'Cadastro - Kratos Pomodoro';
   }, []);
 
   async function handleSubmit(
@@ -28,40 +28,26 @@ export function Login() {
   ) {
     event.preventDefault();
 
-    const isValid = await login(
-      email,
-      password,
-    );
+    try {
+      await registerUser({
+        name,
+        email,
+        password,
+      });
 
-    if (!isValid) {
-      setFeedbackMessage(
-        'Usuário ou senha inválidos.',
+      toast.success(
+        'Conta criada com sucesso.',
       );
 
-      toast.error(
-        'Usuário ou senha inválidos.',
-      );
+      navigate('/');
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Erro ao criar conta';
 
-      return;
+      toast.error(message);
     }
-
-    setFeedbackMessage(
-      'Login realizado com sucesso.',
-    );
-
-    toast.success(
-      'Login realizado com sucesso.',
-    );
-
-    navigate('/home');
-  }
-
-  function handleRegisterClick() {
-    navigate('/register');
-  }
-
-  function handleRecoverClick() {
-    navigate('/forgot-password');
   }
 
   return (
@@ -73,11 +59,11 @@ export function Login() {
 
         <section className={styles.loginCard}>
           <header className={styles.header}>
-            <h1>Entrar no Pomodoro</h1>
+            <h1>Criar conta</h1>
 
             <p>
-              Informe suas credenciais para
-              acessar o sistema.
+              Preencha os dados para se
+              cadastrar.
             </p>
           </header>
 
@@ -87,7 +73,20 @@ export function Login() {
           >
             <div className={styles.inputGroup}>
               <DefaultInput
-                id='email'
+                id='register-name'
+                labelText='Nome'
+                type='text'
+                value={name}
+                onChange={event =>
+                  setName(event.target.value)
+                }
+                placeholder='Digite seu nome'
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <DefaultInput
+                id='register-email'
                 labelText='E-mail'
                 type='email'
                 value={email}
@@ -95,13 +94,12 @@ export function Login() {
                   setEmail(event.target.value)
                 }
                 placeholder='Digite seu e-mail'
-                autoComplete='email'
               />
             </div>
 
             <div className={styles.inputGroup}>
               <DefaultInput
-                id='password'
+                id='register-password'
                 labelText='Senha'
                 type='password'
                 value={password}
@@ -111,7 +109,6 @@ export function Login() {
                   )
                 }
                 placeholder='Digite sua senha'
-                autoComplete='current-password'
               />
             </div>
 
@@ -119,35 +116,18 @@ export function Login() {
               type='submit'
               className={styles.submitButton}
             >
-              Entrar
+              Criar conta
             </button>
           </form>
 
           <div className={styles.actions}>
             <button
               type='button'
-              onClick={handleRegisterClick}
+              onClick={() => navigate('/')}
             >
-              Não tem conta? Cadastre-se
-            </button>
-
-            <button
-              type='button'
-              onClick={handleRecoverClick}
-            >
-              Esqueci minha senha
+              Voltar para o login
             </button>
           </div>
-
-          {feedbackMessage && (
-            <p
-              className={
-                styles.feedbackMessage
-              }
-            >
-              {feedbackMessage}
-            </p>
-          )}
         </section>
       </Container>
     </main>

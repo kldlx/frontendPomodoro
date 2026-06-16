@@ -1,98 +1,147 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
-export const tasksRoutes = Router();
+export const tasksRouter = Router();
 
-// CREATE TASK
-tasksRoutes.post('/', async (req, res) => {
+tasksRouter.use(authMiddleware);
+
+tasksRouter.post('/', async (request, response) => {
+  const { id, name, duration, type, startDate } = request.body;
+
+  if (
+    !id ||
+    !name ||
+    typeof duration !== 'number' ||
+    !type ||
+    !startDate
+  ) {
+    return response.status(400).json({
+      error: 'Dados inválidos',
+    });
+  }
+
   try {
-    const { id, name, duration, type, startDate } = req.body || {};
-
-    if (!id || !name || !duration || !type || !startDate) {
-      return res.status(400).json({ error: 'Missing fields' });
-    }
-
     const task = await prisma.task.create({
       data: {
         id,
         name,
-        duration: Number(duration),
+        duration,
         type,
         startDate: new Date(startDate),
+        userId: request.userId,
       },
     });
 
-    return res.status(201).json(task);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return response.status(201).json(task);
+  } catch {
+    return response.status(409).json({
+      error: 'Task já existe',
+    });
   }
 });
 
-// GET TASKS
-tasksRoutes.get('/', async (req, res) => {
+tasksRouter.get('/', async (request, response) => {
+  const tasks = await prisma.task.findMany({
+    where: {
+      userId: request.userId,
+    },
+    orderBy: {
+      startDate: 'desc',
+    },
+  });
+
+  return response.json(tasks);
+});
+
+tasksRouter.patch('/:id/complete', async (request, response) => {
+  const { id } = request.params;
+  const { completeDate } = request.body;
+
+  if (!completeDate) {
+    return response.status(400).json({
+      error: 'completeDate é obrigatório',
+    });
+  }
+
   try {
-    const tasks = await prisma.task.findMany({
-      orderBy: {
-        startDate: 'desc',
+    const task = await prisma.task.findFirst({
+      where: {
+        id,
+        userId: request.userId,
       },
     });
 
-    return res.json(tasks);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-});
+    if (!task) {
+      return response.status(404).json({
+        error: 'Task não encontrada',
+      });
+    }
 
-// COMPLETE TASK
-tasksRoutes.patch('/:id/complete', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { completeDate } = req.body;
-
-    const task = await prisma.task.update({
-      where: { id },
+    const updatedTask = await prisma.task.update({
+      where: {
+        id,
+      },
       data: {
         completeDate: new Date(completeDate),
       },
     });
 
-    return res.json(task);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return response.json(updatedTask);
+  } catch {
+    return response.status(404).json({
+      error: 'Task não encontrada',
+    });
   }
 });
 
-// INTERRUPT TASK
-tasksRoutes.patch('/:id/interrupt', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { interruptDate } = req.body;
+tasksRouter.patch('/:id/interrupt', async (request, response) => {
+  const { id } = request.params;
+  const { interruptDate } = request.body;
 
-    const task = await prisma.task.update({
-      where: { id },
+  if (!interruptDate) {
+    return response.status(400).json({
+      error: 'interruptDate é obrigatório',
+    });
+  }
+
+  try {
+    const task = await prisma.task.findFirst({
+      where: {
+        id,
+        userId: request.userId,
+      },
+    });
+
+    if (!task) {
+      return response.status(404).json({
+        error: 'Task não encontrada',
+      });
+    }
+
+    const updatedTask = await prisma.task.update({
+      where: {
+        id,
+      },
       data: {
         interruptDate: new Date(interruptDate),
       },
     });
 
-    return res.json(task);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return response.json(updatedTask);
+  } catch {
+    return response.status(404).json({
+      error: 'Task não encontrada',
+    });
   }
 });
 
-// DELETE ALL TASKS
-tasksRoutes.delete('/', async (req, res) => {
-  try {
-    await prisma.task.deleteMany();
+tasksRouter.delete('/', async (request, response) => {
+  await prisma.task.deleteMany({
+    where: {
+      userId: request.userId,
+    },
+  });
 
-    return res.status(204).send();
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
+  return response.status(204).send();
 });

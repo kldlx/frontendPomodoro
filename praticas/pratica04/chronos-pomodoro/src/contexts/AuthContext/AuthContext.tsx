@@ -1,10 +1,29 @@
-// src/contexts/AuthContext/AuthContext.tsx
-import { createContext } from "react";
+import { createContext } from 'react';
 
-interface AuthContextType {
+export type AuthUser = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+type AuthContextProps = {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => boolean;
+  user: AuthUser | null;
+  login: (
+    email: string,
+    password: string,
+  ) => Promise<boolean>;
   logout: () => void;
-}
+};
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const initialContextValue: AuthContextProps = {
+  isAuthenticated: false,
+  user: null,
+  login: async () => false,
+  logout: () => {},
+};
+
+export const AuthContext =
+  createContext<AuthContextProps>(
+    initialContextValue,
+  );

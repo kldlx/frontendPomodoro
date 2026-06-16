@@ -5,80 +5,54 @@ import { DefaultInput } from '../../components/DefaultInput';
 import { Heading } from '../../components/Heading';
 import { MainTemplate } from '../../templates/MainTemplate';
 import { useTaskContext } from '../../contexts/TaskContext/useTaskContext';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { showMessage } from '../../adapters/showMessage';
 import { TaskActionTypes } from '../../contexts/TaskContext/taskActions';
-import { updateSettings } from '../../services/settingsService';
+import { updateSettings } from '../../services/api';
 
 export function Settings() {
-  const { state, dispatch, isLoadingSettings } = useTaskContext();
-  const [isSavingSettings, setIsSavingSettings] = useState(false);
-  const isSettingsDisabled = isLoadingSettings || isSavingSettings;
-
+  const { state, dispatch } = useTaskContext();
   const workTimeInput = useRef<HTMLInputElement>(null);
   const shortBreakTimeInput = useRef<HTMLInputElement>(null);
   const longBreakTimeInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    document.title = 'Configurações - Chronos Pomodoro';
+    document.title = 'Configurações - Kratos Pomodoro';
   }, []);
 
-  async function handleSaveSettings(
-    e: React.FormEvent<HTMLFormElement>,
-  ) {
-    e.preventDefault();
 
+  async function handleSaveSettings(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     showMessage.dismiss();
 
     const formErrors = [];
 
     const workTime = Number(workTimeInput.current?.value);
+    const shortBreakTime = Number(shortBreakTimeInput.current?.value);
+    const longBreakTime = Number(longBreakTimeInput.current?.value);
 
-    const shortBreakTime = Number(
-      shortBreakTimeInput.current?.value,
-    );
-
-    const longBreakTime = Number(
-      longBreakTimeInput.current?.value,
-    );
-
-    if (
-      isNaN(workTime) ||
-      isNaN(shortBreakTime) ||
-      isNaN(longBreakTime)
-    ) {
-      formErrors.push(
-        'Digite apenas números para TODOS os campos',
-      );
+    if (isNaN(workTime) || isNaN(shortBreakTime) || isNaN(longBreakTime)) {
+      formErrors.push('Digite apenas números para TODOS os campos');
     }
 
     if (workTime < 1 || workTime > 99) {
-      formErrors.push(
-        'Digite valores entre 1 e 99 para foco',
-      );
+      formErrors.push('Digite valores entre 1 e 99 para foco');
     }
 
     if (shortBreakTime < 1 || shortBreakTime > 30) {
-      formErrors.push(
-        'Digite valores entre 1 e 30 para descanso curto',
-      );
+      formErrors.push('Digite valores entre 1 e 30 para descanso curto');
     }
 
     if (longBreakTime < 1 || longBreakTime > 60) {
-      formErrors.push(
-        'Digite valores entre 1 e 60 para descanso longo',
-      );
+      formErrors.push('Digite valores entre 1 e 60 para descanso longo');
     }
 
     if (formErrors.length > 0) {
       formErrors.forEach(error => {
         showMessage.error(error);
       });
-
       return;
     }
-
-    setIsSavingSettings(true);
 
     try {
       await updateSettings({
@@ -86,22 +60,20 @@ export function Settings() {
         shortBreakTime,
         longBreakTime,
       });
+    
+      dispatch({
+        type: TaskActionTypes.CHANGE_SETTINGS,
+        payload: {
+          workTime,
+          shortBreakTime,
+          longBreakTime,
+        },
+      });
+    
+      showMessage.success('Configurações salvas');
     } catch {
-      return;
-    } finally {
-      setIsSavingSettings(false);
+      showMessage.error('Erro ao salvar configurações');
     }
-
-    dispatch({
-      type: TaskActionTypes.CHANGE_SETTINGS,
-      payload: {
-        workTime,
-        shortBreakTime,
-        longBreakTime,
-      },
-    });
-
-    showMessage.success('Configurações salvas');
   }
 
   return (
@@ -112,20 +84,13 @@ export function Settings() {
 
       <Container>
         <p style={{ textAlign: 'center' }}>
-          {isLoadingSettings && 'Carregando configurações...'}
-          {isSavingSettings && 'Salvando configurações...'}
-          {!isSettingsDisabled &&
-            'Modifique as configurações para tempo de foco, descanso curto e descanso longo.'}
+          Modifique as configurações para tempo de foco, descanso curso e
+          descanso longo.
         </p>
       </Container>
 
       <Container>
-        <form
-          key={`${state.config.workTime}-${state.config.shortBreakTime}-${state.config.longBreakTime}`}
-          onSubmit={handleSaveSettings}
-          action=''
-          className='form'
-        >
+        <form onSubmit={handleSaveSettings} action='' className='form'>
           <div className='formRow'>
             <DefaultInput
               id='workTime'
@@ -133,10 +98,8 @@ export function Settings() {
               ref={workTimeInput}
               defaultValue={state.config.workTime}
               type='number'
-              disabled={isSettingsDisabled}
             />
           </div>
-
           <div className='formRow'>
             <DefaultInput
               id='shortBreakTime'
@@ -144,10 +107,8 @@ export function Settings() {
               ref={shortBreakTimeInput}
               defaultValue={state.config.shortBreakTime}
               type='number'
-              disabled={isSettingsDisabled}
             />
           </div>
-
           <div className='formRow'>
             <DefaultInput
               id='longBreakTime'
@@ -155,16 +116,13 @@ export function Settings() {
               ref={longBreakTimeInput}
               defaultValue={state.config.longBreakTime}
               type='number'
-              disabled={isSettingsDisabled}
             />
           </div>
-
           <div className='formRow'>
             <DefaultButton
               icon={<SaveIcon />}
               aria-label='Salvar configurações'
               title='Salvar configurações'
-              disabled={isSettingsDisabled}
             />
           </div>
         </form>

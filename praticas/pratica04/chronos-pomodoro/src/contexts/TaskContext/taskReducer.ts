@@ -3,7 +3,6 @@ import { formatSecondsToMinutes } from '../../utils/formatSecondsToMinutes';
 import { getNextCycle } from '../../utils/getNextCycle';
 import { initialTaskState } from './initialTaskState';
 import { TaskActionTypes, type TaskActionModel } from './taskActions';
-import { completeTask } from '../../services/tasksService';
 
 export function taskReducer(
   state: TaskStateModel,
@@ -39,14 +38,6 @@ export function taskReducer(
       };
     }
     case TaskActionTypes.COMPLETE_TASK: {
-      if (state.activeTask) {
-        void completeTask(
-          state.activeTask.id,
-          Date.now(),
-          { notifyOnError: false },
-        ).catch(() => undefined);
-      }
-
       return {
         ...state,
         activeTask: null,
@@ -72,11 +63,14 @@ export function taskReducer(
         ),
       };
     }
+    case TaskActionTypes.LOAD_TASKS: {
+      return {
+        ...state,
+        tasks: action.payload,
+      };
+    }
     case TaskActionTypes.CHANGE_SETTINGS: {
       return { ...state, config: { ...action.payload } };
-    }
-    case TaskActionTypes.LOAD_TASKS: {
-      return { ...state, tasks: action.payload };
     }
   }
 

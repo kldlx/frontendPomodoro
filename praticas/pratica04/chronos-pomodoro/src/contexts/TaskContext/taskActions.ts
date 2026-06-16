@@ -24,32 +24,32 @@ export type TaskActionTypes =
 
 export type TaskActionsWithPayload =
   | {
-    type: typeof TaskActionTypes.START_TASK;
-    payload: TaskModel;
-  }
+      type: typeof TaskActionTypes.START_TASK;
+      payload: TaskModel;
+    }
   | {
-    type: typeof TaskActionTypes.COUNT_DOWN;
-    payload: { secondsRemaining: number };
-  }
+      type: typeof TaskActionTypes.COUNT_DOWN;
+      payload: { secondsRemaining: number };
+    }
   | {
-    type: typeof TaskActionTypes.CHANGE_SETTINGS;
-    payload: TaskStateModel['config'];
-  }
+      type: typeof TaskActionTypes.CHANGE_SETTINGS;
+      payload: TaskStateModel['config'];
+    }
   | {
-    type: typeof TaskActionTypes.LOAD_TASKS;
-    payload: TaskModel[];
-  };
+      type: typeof TaskActionTypes.LOAD_TASKS;
+      payload: TaskModel[];
+    };
 
 export type TaskActionsWithoutPayload =
   | {
-    type: typeof TaskActionTypes.RESET_STATE;
-  }
+      type: typeof TaskActionTypes.RESET_STATE;
+    }
   | {
-    type: typeof TaskActionTypes.INTERRUPT_TASK;
-  }
+      type: typeof TaskActionTypes.INTERRUPT_TASK;
+    }
   | {
-    type: typeof TaskActionTypes.COMPLETE_TASK;
-  };
+      type: typeof TaskActionTypes.COMPLETE_TASK;
+    };
 
 export type TaskActionModel =
   | TaskActionsWithPayload

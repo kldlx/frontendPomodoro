@@ -6,15 +6,11 @@ import type { TaskActionModel } from './taskActions';
 type TaskContextProps = {
   state: TaskStateModel;
   dispatch: Dispatch<TaskActionModel>;
-  isLoadingSettings: boolean;
-  isLoadingTasks: boolean;
 };
 
 const initialContextValue = {
   state: initialTaskState,
   dispatch: () => {},
-  isLoadingSettings: false,
-  isLoadingTasks: false,
 };
 
 export const TaskContext = createContext<TaskContextProps>(initialContextValue);
